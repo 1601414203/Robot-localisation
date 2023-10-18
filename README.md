@@ -1,45 +1,68 @@
-# Particle Filter Localization
-The PFLocaliser class implements a Particle Filter for robot localization, with a focus on handling "kidnapping" scenarios where the robot is suddenly displaced. It maintains a cloud of particles to estimate the robot's pose and can globally resample particles in response to detected kidnappings.
-# Features
+# PF Localisation Package (Skeleton Code)
 
-#### Particle Filter Algorithm
-A statistical method to estimate the robot's pose by propagating a cloud of particles.
+## Particle Filter Exercise
 
-#### Kidnap Detection
-Ability to detect abrupt changes in the robot's pose that may indicate a kidnapping scenario.
+This package implements the particle filter localisation using sensor and motion update from the Pioneer P3-DX robot. The methods in `src/pf_localisation/pf.py` have to be completed correctly to run the node. Read the assignment lab notes for more instructions on how to complete these methods. You can also find documentation regarding each method in the source files.
 
-#### Global Resampling
-In case of kidnapping detection, a global resampling of particles is performed to recover the correct pose.
+#### Note:
 
-#### Modular Structure
-Built with a modular structure making it easy to integrate with other ROS (Robot Operating System) based systems.
-# Getting Started
-#### Prerequisites
+* You need to make changes **ONLY** in `pf.py` file for completing the localisation package. If you want to change any of the inherited parameters (parameters inherited from the parent class `PFLocaliserBase`), it is best to do so from the child class itself (i.e. in `PFLocaliser` class in `pf.py`).
 
-    ROS (Robot Operating System)
-    Python
-    NumPy library
-    
-# Installation
+* However, you may play with different values for parameters in the other files (eg. `sensor_model.py`) for conducting experiments.
 
-#### Clone the repository to your local machine, navigate to the project directory, and execute the following commands to get started:
-    $ cd path/to/project
-    $ pip install -r requirements.txt
-    $ rosrun your_package pf_localiser.py
-# Usage
 
-#### Initialise Particle Cloud:
-        Initialize the particle cloud based on the initial pose estimate.
-        Update Particle Cloud:
-        Update the particle cloud based on the latest sensor readings.
-        Estimate Pose:
-        Estimate the robot's pose by computing the weighted mean of the particle cloud.
-    Detect Kidnap:
-        Check for abrupt changes in
-# Contributing
+### Building Package:
 
-Feel free to fork the project, create a new branch, and submit your pull requests.
-License
-
-This project is licensed under the MIT License. pose and trigger global resampling if kidnapping is detected.
+* Move package to your catkin workspace (`src` directory)
+* Rebuild catkin workspace 
         
+        catkin_make    # ----- run from root directory of catkin workspace
+
+* Compile laser_trace.cpp (provides laser ray tracing) as follows **if you are not using arm system(windows, unix...)**:
+
+        cd <catkin_ws>/src/pf_localisation/src/laser_trace
+        ./compile.sh #You may have to '''chmod +x compile.sh'''
+
+* replace `./compile.sh` with `./compilearm.sh`  **if you are using arm system(m1 chip mac)**:
+
+If correctly compiled, you should find `laser_trace.so` in the directory `<catkin_ws>/src/pf_localisation/src/pf_localisation`.
+If the ***code does not compile*** you need to install PythonBoost from https://github.com/boostorg/python. This requires the download and compiling of Boost and installation of Faber.
+
+### Running the node:
+
+#### On real robot:
+
+        roscore  # ----- not necessary if roslaunch is called before running any nodes with rosrun
+        roslaunch socspioneer p2os_laser.launch
+        roslaunch socspioneer teleop_joy.launch # ----- for teleoperation control (if implementing automatic collision avoidance node, run that instead)
+        rosrun map_server map_server <path_to_your_map_yaml_file>
+        rosrun pf_localisation node.py    # ----- requires laser_trace, and completed pf.py methods.
+
+#### In simulated world:
+
+The localisation node can be tested in stage simulation (without the need for robot).
+
+        roscore
+        rosrun map_server map_server <catkin_ws>/map.yaml
+        rosrun stage_ros stageros <catkin_ws>/src/socspioneer/data/meeting.world
+        roslaunch socspioneer keyboard_teleop.launch  # ---- run only if you want to move robot using keyboard 
+        rosrun pf_localisation node.py    # ----- requires laser_trace, and completed pf.py methods.
+
+**Don't forget to make node.py executable by using ```chmod +x node.py```**
+
+### Published Topics:
+
+Running the node successfully will publish the following topics:
+
+* `/map` 
+* `/amcl_pose` 
+* `/particle_cloud`
+
+All of these can be visualised in RViz by adding the appropriate Views.
+
+
+### Advice:
+
+* Once you have a basic understanding of what you have to do in the `PFLocaliser` class of `pf.py` file, it is a good idea to look at its parent class `PFLocaliserBase` in `pf_base.py` to see how the other parts of the localisation algorithm is implemented. 
+* You may also go through `sensor_model.py` to see how the sensor model is coded, and how the model update is implemented. The different parameter values that were empirically chosen can also be found here. 
+* Read through `node.py` to understand how the node is impelemented to perform the update whenever new information is available. You can also see how `rospy logging` is used for logging useful information to console. You may also use this for debugging purposes.
