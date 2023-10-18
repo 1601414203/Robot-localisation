@@ -1,8 +1,8 @@
-# PF Localisation Package (Skeleton Code)
+# Particle Filter Localization
 
 ## Particle Filter Exercise
 
-This package implements the particle filter localisation using sensor and motion update from the Pioneer P3-DX robot. The methods in `src/pf_localisation/pf.py` have to be completed correctly to run the node. Read the assignment lab notes for more instructions on how to complete these methods. You can also find documentation regarding each method in the source files.
+This package implements the particle filter localisation using sensor and motion update from the Pioneer P3-DX robot. The methods in `src/pf_localisation/pf.py` have  be completed  to run the node. 
 
 #### Note:
 
